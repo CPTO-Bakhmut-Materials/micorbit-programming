@@ -47,3 +47,5 @@
     ```python
     radio.set_group(5)
     ```
+
+1. Щоб перевірити роботу нам потрібно перейти https://makecode.microbit.org/---multi# і завантажити проект на два пристрої
