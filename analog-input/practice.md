@@ -189,7 +189,8 @@
     ![](img/7.png)
 
 Результат: 
-    [![Click](https://img.youtube.com/vi/5ffBVejGJ48/maxresdefault.jpg)](https://www.youtube.com/watch?v=5ffBVejGJ48/maxresdefault.jpg)
+    <video controls src="https://github.com/user-attachments/assets/03a15ee4-bbbe-4056-8a64-a54dd6238f35">
+    </video>
 
 ### Додаткове завдання
 
