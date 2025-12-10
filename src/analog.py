@@ -4,6 +4,9 @@ point_y = 2                         # Змінна - Y координата
 calibrated_v_x = infinity           # Змінна - X який буде 0
 calibrated_v_y = infinity           # Змінна - Y який буде 0
 
+_ = pins.analog_read_pin(AnalogPin.P0)  # Нам потрібно зчитати пін щоб ініціалізувати симулятор
+_ = pins.analog_read_pin(AnalogPin.P1)  # ↑
+
 def on_button_pressed_a():                              # Оголошуємо функцію яка буде опрацьовуватися при натисканні
     global calibrated_v_x, calibrated_v_y               # Використати глобальнні змінні
     calibrated_v_x = pins.analog_read_pin(AnalogPin.P0) # Зчитати пін 0 і записати його для подальшої роботи
