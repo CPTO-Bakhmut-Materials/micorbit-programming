@@ -188,11 +188,8 @@
 
     ![](img/7.png)
 
-Результат:
-
-<video controls>
-  <source src="img/result.mkv" type="video/mp4">
-</video>
+Результат: 
+    [![Click](https://img.youtube.com/vi/5ffBVejGJ48/maxresdefault.jpg)](https://www.youtube.com/watch?v=5ffBVejGJ48/maxresdefault.jpg)
 
 ### Додаткове завдання
 
