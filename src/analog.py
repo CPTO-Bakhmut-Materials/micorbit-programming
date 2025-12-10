@@ -14,6 +14,11 @@ led.plot(point_x, point_y)          # Засвітити діод на пози�
 
 def on_forever():                   # Оголошуємо функцію яка міститиме наш головний код
     global point_x, point_y         # Використати глобальнні змінні
+    global calibrated_v_y           # ↑↑
+    global calibrated_v_x           # ↑
+
+    if calibrated_v_y == infinity or calibrated_v_x == infinity: # Перевірити чи ми зробили калібрацію нуля
+        return                                                   # Вийти з функції
 
     v_x = pins.analog_read_pin(AnalogPin.P0) # Зчитати пін 0
     v_y = pins.analog_read_pin(AnalogPin.P1) # Зчитати пін 1
