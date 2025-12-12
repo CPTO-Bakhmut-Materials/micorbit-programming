@@ -1,6 +1,7 @@
 TICK_TIME = 1000                    # Змінна - час очікування
 MIN_LED = 0
 MAX_LED = 4
+DEAD_ZONE = 250                     # Змінна - відповідає за чутливість контролера
 point_x = 2                         # Змінна - X координата
 point_y = 2                         # Змінна - Y координата
 calibrated_v_x = infinity           # Змінна - X який буде 0
@@ -44,8 +45,12 @@ def on_forever():                   # Оголошуємо функцію яка
     v_x = pins.analog_read_pin(AnalogPin.P0) # Зчитати пін 0
     v_y = pins.analog_read_pin(AnalogPin.P1) # Зчитати пін 1
     led.unplot(point_x, point_y)    # Виключити діод
-    d_x = v_x - calibrated_v_x      # Знайти зміщення по x
-    d_y = v_y - calibrated_v_y      # Знайти зміщення по y
+    d_x = (v_x - calibrated_v_x)    # Знайти зміщення по x
+    if d_x < DEAD_ZONE:             # Перевірка зміщення по x. Якщо менше ніж DEAD_ZONE
+        d_x = 0                     # то зміщення 0
+    d_y = (v_y - calibrated_v_y)    # Знайти зміщення по y
+    if d_y < DEAD_ZONE:             # Перевірка зміщення по y. Якщо менше ніж DEAD_ZONE
+        d_y = 0                     # то зміщення 0
     point_x = clamp(point_x + sign(d_x), MIN_LED, MAX_LED)   # Змістити координату X на -1 або +1 і обмежити лише до 0-4
     point_y = clamp(point_y + sign(d_y), MIN_LED, MAX_LED)   # Змістити координату Y на -1 або +1 і обмежити лише до 0-4
     led.plot(point_x, point_y)      # Ввімкнути діод
