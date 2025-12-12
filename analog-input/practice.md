@@ -39,6 +39,94 @@
       TICK_TIME = 1000                    # Змінна - час очікування
       point_x = 2                         # Змінна - X координата
       point_y = 2                         # Змінна - Y координата
+  
+      led.plot(point_x, point_y)          # Засвітити діод на позиції
+  
+      def on_forever():                   # Оголошуємо функцію яка міститиме наш головний код
+    ~     global point_x, point_y         # Використати глобальнні змінні
+  
+    ~     v_x = pins.analog_read_pin(AnalogPin.P0) # Зчитати пін 0
+    ~     v_y = pins.analog_read_pin(AnalogPin.P1) # Зчитати пін 1
+          led.unplot(point_x, point_y)    # Виключити діод
+    ~     point_x = point_x + v_x         # Змістити координату X
+    ~     point_y = point_y + v_y         # Змістити координату Y
+          led.plot(point_x, point_y)      # Ввімкнути діод
+          pause(TICK_TIME)                # Очікуємо 1000 мілісекунд
+      forever(on_forever)                 # Говоримо комп'ютеру щоб він постійно викликав функцію
+    ```
+
+    Ну нас є проблема що при подачі на аналогові входи живлення наш діод зникає. Це відбувається через те що сигнал на діоді може бути від 0 до 1023 і при додаванні ми отримуємо координати які знаходяться за межами матриці діодів
+
+1. Тепер відкалібруємо наш контролер - нам потрібно знайти точку 0, тобто яке значення нам передає джойстик у стані спокою, записати його і використовувати в подальших операціях. Ми використаємо кнопку А щоб знати точно час коли джойстик знаходитьсяв стані 0
+
+    ```
+      TICK_TIME = 1000                    # Змінна - час очікування
+      point_x = 2                         # Змінна - X координата
+      point_y = 2                         # Змінна - Y координата
+    ~ calibrated_v_x = infinity           # Змінна - X який буде 0
+    ~ calibrated_v_y = infinity           # Змінна - Y який буде 0
+  
+    ~ def on_button_pressed_a():                              # Оголошуємо функцію яка буде опрацьовуватися при натисканні
+    ~     global calibrated_v_x, calibrated_v_y               # Використати глобальнні змінні
+    ~     calibrated_v_x = pins.analog_read_pin(AnalogPin.P0) # Зчитати пін 0 і записати його для подальшої роботи
+    ~     calibrated_v_y = pins.analog_read_pin(AnalogPin.P1) # Зчитати пін 1 і записати його для подальшої роботи
+    ~ input.on_button_pressed(Button.A, on_button_pressed_a)  # Говоримо комп'ютеру яку функцію викликати при натисканні кнопки
+  
+      led.plot(point_x, point_y)          # Засвітити діод на позиції
+  
+      def on_forever():                   # Оголошуємо функцію яка міститиме наш головний код
+          global point_x, point_y         # Використати глобальнні змінні
+  
+          v_x = pins.analog_read_pin(AnalogPin.P0) # Зчитати пін 0
+          v_y = pins.analog_read_pin(AnalogPin.P1) # Зчитати пін 1
+          led.unplot(point_x, point_y)    # Виключити діод
+          point_x = point_x + v_x         # Змістити координату X
+          point_y = point_y + v_y         # Змістити координату Y
+          led.plot(point_x, point_y)      # Ввімкнути діод
+          pause(TICK_TIME)                # Очікуємо 1000 мілісекунд
+      forever(on_forever)                 # Говоримо комп'ютеру щоб він постійно викликав функцію
+    ```
+
+1. Тепер коли у нас є процес калібрації ми можемо знати коли саме контролер може співпрацювати з джойстиком. Ми зробимо це через простий **if**
+
+    ```python
+      TICK_TIME = 1000                    # Змінна - час очікування
+      point_x = 2                         # Змінна - X координата
+      point_y = 2                         # Змінна - Y координата
+      calibrated_v_x = infinity           # Змінна - X який буде 0
+      calibrated_v_y = infinity           # Змінна - Y який буде 0
+  
+      def on_button_pressed_a():                              # Оголошуємо функцію яка буде опрацьовуватися при натисканні
+          global calibrated_v_x, calibrated_v_y               # Використати глобальнні змінні
+          calibrated_v_x = pins.analog_read_pin(AnalogPin.P0) # Зчитати пін 0 і записати його для подальшої роботи
+          calibrated_v_y = pins.analog_read_pin(AnalogPin.P1) # Зчитати пін 1 і записати його для подальшої роботи
+      input.on_button_pressed(Button.A, on_button_pressed_a)  # Говоримо комп'ютеру яку функцію викликати при натисканні кнопки
+  
+      led.plot(point_x, point_y)          # Засвітити діод на позиції
+  
+      def on_forever():                   # Оголошуємо функцію яка міститиме наш головний код
+          global point_x, point_y         # Використати глобальнні змінні
+          global calibrated_v_y           # ↑↑
+          global calibrated_v_x           # ↑
+  
+    ~     if calibrated_v_y == infinity or calibrated_v_x == infinity: # Перевірити чи ми зробили калібрацію нуля
+    ~         return                                                   # Вийти з функції
+  
+          v_x = pins.analog_read_pin(AnalogPin.P0) # Зчитати пін 0
+          v_y = pins.analog_read_pin(AnalogPin.P1) # Зчитати пін 1
+          led.unplot(point_x, point_y)    # Виключити діод
+          point_x = point_x + v_x         # Змістити координату X
+          point_y = point_y + v_y         # Змістити координату Y
+          led.plot(point_x, point_y)      # Ввімкнути діод
+          pause(TICK_TIME)                # Очікуємо 1000 мілісекунд
+      forever(on_forever)                 # Говоримо комп'ютеру щоб він постійно викликав функцію
+    ```
+
+1. Тепер нам потрібно нормалізувати значення, перетворити діапазон [0-1023] в -1 або 0 або 1
+    ```python
+      TICK_TIME = 1000                    # Змінна - час очікування
+      point_x = 2                         # Змінна - X координата
+      point_y = 2                         # Змінна - Y координата
       calibrated_v_x = infinity           # Змінна - X який буде 0
       calibrated_v_y = infinity           # Змінна - Y який буде 0
   
